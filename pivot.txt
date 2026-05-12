@@ -1,0 +1,53 @@
+data = [
+    ("AA", 1, 10),
+    ("AA", 2, 20),
+    ("BA", 1, 15),
+    ("BA", 2, 25),
+    ("CA", 1, 12),
+    ("CA", 2, 30)
+]
+
+columns = ["Airline", "Month", "Delay"]
+
+df = spark.createDataFrame(data, columns)
+Show Dataset
+df.show()
+PIVOT
+Average Delay
+pivot_df = df.groupBy("Month") \
+             .pivot("Airline") \
+             .avg("Delay")
+
+pivot_df.show()
+Pivot with Specific Values
+pivot_df = df.groupBy("Month") \
+             .pivot("Airline", ["AA", "BA", "CA"]) \
+             .avg("Delay")
+
+pivot_df.show()
+Pivot using SUM
+df.groupBy("Month") \
+  .pivot("Airline") \
+  .sum("Delay") \
+  .show()
+Pivot using COUNT
+df.groupBy("Month") \
+  .pivot("Airline") \
+  .count() \
+  .show()
+UNPIVOT
+Import expr
+from pyspark.sql.functions import expr
+Unpivot using stack()
+unpivot_df = pivot_df.select(
+    "Month",
+    expr("""
+        stack(3,
+        'AA', AA,
+        'BA', BA,
+        'CA', CA
+        ) as (Airline, Delay)
+    """)
+)
+
+unpivot_df.show()

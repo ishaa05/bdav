@@ -1,0 +1,75 @@
+from pyspark.sql.functions import *
+df = spark.read.csv(
+    "On_Time_Reporting.csv",
+    header=True,
+    inferSchema=True
+)
+df.printSchema()
+df.show(5)
+df.count()
+df.select("ArrDelay", "DepDelay").show()
+df.filter(col("ArrDelay") > 30).show()
+df.dropna().show()
+
+Remove specific columns
+important_cols = [
+    "ArrDelay",
+    "DepDelay",
+    "Operating_Airline",
+    "Origin",
+    "Dest"
+]
+
+df_clean = df.dropna(subset=important_cols)
+Remove Duplicate Rows
+df_clean = df_clean.dropDuplicates()
+Check Null Values
+df.select([
+    count(when(col(c).isNull(), c)).alias(c)
+    for c in df.columns
+]).show()
+Group By + Average
+df.groupBy("Operating_Airline") \
+  .agg(avg("ArrDelay")) \
+  .show()
+Sort Values
+df.orderBy(col("ArrDelay").desc()).show()
+Create New Column
+df.withColumn(
+    "DelayCategory",
+    when(col("ArrDelay") <= 0, "On Time")
+    .otherwise("Delayed")
+).show()
+Define UDF
+from pyspark.sql.functions import udf
+from pyspark.sql.types import StringType
+Create UDF Function
+def delay_status(x):
+    if x <= 0:
+        return "On Time"
+    else:
+        return "Delayed"
+Register UDF
+delay_udf = udf(delay_status, StringType())
+Apply UDF
+df.withColumn(
+    "Status",
+    delay_udf(col("ArrDelay"))
+).show()
+Outlier Detection Using IQR
+Calculate Quartiles
+Q1, Q3 = df_clean.approxQuantile(
+    "ArrDelay",
+    [0.25, 0.75],
+    0
+)
+Calculate IQR
+IQR = Q3 - Q1
+Bounds
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+Remove Outliers
+df_no_outliers = df_clean.filter(
+    (col("ArrDelay") >= lower) &
+    (col("ArrDelay") <= upper)
+)
