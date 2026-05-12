@@ -1,0 +1,52 @@
+sbin/start-all.sh
+
+start-dfs.sh Start HDFS
+stop-dfs.sh Stop HDFS
+start-yarn.sh Start YARN
+stop-yarn.sh Stop YARN
+jps Check running Hadoop services
+hdfs namenode -format Format NameNode
+
+
+hdfs dfs -ls /path List files in directory
+hdfs dfs -mkdir /path Create directory
+hdfs dfs -mkdir -p /path Create nested directories
+hdfs dfs -rmdir /path Remove empty directory
+hdfs dfs -rm /file Delete file
+hdfs dfs -rm -r /dir Delete directory recursively
+hdfs dfs -cp src dst Copy file
+hdfs dfs -mv src dst Move file
+hdfs dfs -put localfile /hdfs/path Upload file to HDFS
+hdfs dfs -get /hdfs/file localpath Download file from HDFS
+hdfs dfs -copyFromLocal file /hdfs Copy from local
+hdfs dfs -copyToLocal /hdfs/file Copy to local
+hdfs dfs -cat /file View file content
+hdfs dfs -tail /file View last part of file
+hdfs dfs -du /path Disk usage
+hdfs dfs -df -h Check HDFS free space
+hdfs dfs -count /path Count files, directories
+hdfs dfs -chmod 755 /file Change permissions
+hdfs dfs -chown user:group /file Change owner
+hdfs dfs -setrep 3 /file Set replication factor
+
+Yarn Commands
+
+yarn application -list List running applications
+yarn application -status <appID> Application status
+yarn application -kill <appID> Kill application
+yarn node -list List cluster nodes
+yarn logs -applicationId <appID> View application logs
+
+Map Reduce commands
+
+hadoop jar file.jar mainClass input output      (Run MapReduce job)
+mapred job -list List jobs
+mapred job -status <jobID> Job status
+mapred job -kill <jobID> Kill job
+
+HDFS
+
+hdfs dfsadmin -report Cluster report
+hdfs dfsadmin -safemode get Check safemode
+hdfs dfsadmin -safemode leave Leave safemode
+hdfs balancer Balance cluste
